@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@drawable/fondoincio"
     android:gravity="end|bottom"
+    android:orientation="vertical"
     android:paddingEnd="16dp"
     android:paddingBottom="120dp">
 
     <!-- cuadro -->
+
     <GridLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,9 +17,9 @@
         android:columnCount="2"
         android:rowCount="2"
         android:rowOrderPreserved="false"
-        android:useDefaultMargins="false"
         android:scaleX="0.9"
-        android:scaleY="0.9">
+        android:scaleY="0.9"
+        android:useDefaultMargins="false">
 
         <ImageButton
             android:id="@+id/btn2"
@@ -66,7 +67,5 @@
         android:layout_marginTop="50dp"
         android:background="@null"
         android:scaleType="fitCenter"
-        android:src="@drawable/incio"
-
-
+        android:src="@drawable/incio"/>
 </LinearLayout>
