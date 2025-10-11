@@ -35,11 +35,6 @@
             android:screenOrientation="landscape"
             android:exported="false" />
 
-        <!-- Otra pantalla si la llegamos a necesitar -->
-        <activity
-            android:name=".ScreenPrincipal"
-            android:exported="false" />
-
     </application>
 
 </manifest>
