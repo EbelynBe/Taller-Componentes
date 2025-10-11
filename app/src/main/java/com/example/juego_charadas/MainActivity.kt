@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
         val sizeEquipos = 50.sp
         val playerTextSize = 70.sp
 
-        // 🔹 Fondo principal
+
         Image(
             painter = painterResource(id = R.drawable.fondo),
             contentDescription = null,
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
 
-            // 🔹 Caja morada de categorías
+
             Box(
                 modifier = Modifier
                     .size(230.dp, 260.dp)
@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // 🔹 Caja amarilla decorativa con control de jugadores
+
             var playersPerTeam by remember { mutableStateOf(2) }
             val minPlayers = 2
 
@@ -113,7 +113,7 @@ class MainActivity : ComponentActivity() {
                     .offset(x = -80.dp, y = 227.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Fondo amarillo
+
                 Image(
                     painter = painterResource(id = R.drawable.yellowbackground),
                     contentDescription = null,
@@ -128,7 +128,7 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 🔸 Botón izquierda (restar jugadores)
+
                     ImagenBoton(
                         drawableId = R.drawable.left,
                         modifier = Modifier.size(45.dp)
@@ -137,7 +137,7 @@ class MainActivity : ComponentActivity() {
                         CalculatePlayers(playersPerTeam)
                     }
 
-                    // 🔸 Texto central (número de jugadores)
+
                     Text(
                         text = "$playersPerTeam",
                         fontSize = playerTextSize,
@@ -146,7 +146,7 @@ class MainActivity : ComponentActivity() {
                         color = Color.White
                     )
 
-                    // 🔸 Botón derecha (sumar jugadores SIN límite máximo)
+
                     ImagenBoton(
                         drawableId = R.drawable.right,
                         modifier = Modifier.size(45.dp)
@@ -157,7 +157,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // 🔹 Caja de equipos
+
             Box(
                 modifier = Modifier
                     .size(200.dp)
@@ -230,14 +230,14 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // 🔹 Botón de inicio
+
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .offset(y = (-20).dp)
             ) {
                 ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
-                    val intent = Intent(this@MainActivity, GameActivity::class.java)
+                    val intent = Intent(this@MainActivity, TeamsActivity::class.java)
                     intent.putExtra("teams", teams)
                     intent.putExtra("category", selectedCategory.name)
                     startActivity(intent)
@@ -253,7 +253,7 @@ class MainActivity : ComponentActivity() {
     }
 
     fun CalculatePlayers(players: Int) {
-        // Puedes agregar lógica adicional si lo necesitas
+
     }
 
     @Composable

@@ -66,7 +66,7 @@ fun ScreenPrincipal(navController: NavController) {
                     .padding(vertical = 0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
 
-            ) {
+                ) {
                 ImagenBoton(R.drawable.categoryfood, modifier = Modifier.size(60.dp)) {
 
                 }
