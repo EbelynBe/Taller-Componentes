@@ -7,19 +7,19 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.core.graphics.toColorInt
 import com.example.juego_charadas.model.Category
 import com.example.juego_charadas.ui.theme.buttonAnimation
@@ -28,9 +28,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            ScreenPrincipal()
-        }
+        setContent { ScreenPrincipal() }
     }
 
     @Composable
@@ -38,17 +36,15 @@ class MainActivity : ComponentActivity() {
         var selectedCategory by remember { mutableStateOf(Category.Animals) }
         var teams by remember { mutableStateOf(2) }
 
-        // Estados para jugadores
+        // 🎯 Calcular mínimo según cantidad de equipos
         var minPlayers by remember { mutableStateOf(calculateMinPlayers(teams)) }
-        var playersPerTeam by remember { mutableStateOf(minPlayers) }
+        var totalPlayers by remember { mutableStateOf(minPlayers) }
 
-        // 🔹 Cada vez que cambia la cantidad de equipos, reinicia los valores correctamente
         LaunchedEffect(teams) {
             minPlayers = calculateMinPlayers(teams)
-            playersPerTeam = minPlayers
+            totalPlayers = minPlayers
         }
 
-        // Tipografías y colores
         val customFont = FontFamily(Font(R.font.wonderian))
         val colorSeleccionado = Color("#1798C9".toColorInt())
         val colorNormal = Color("#1EC0FF".toColorInt())
@@ -131,30 +127,21 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    // Flecha izquierda ➖
-                    ImagenBoton(
-                        drawableId = R.drawable.left,
-                        modifier = Modifier.size(45.dp)
-                    ) {
-                        if (playersPerTeam > minPlayers) playersPerTeam--
+                    ImagenBoton(R.drawable.left, Modifier.size(45.dp)) {
+                        // 👇 No permitir bajar del mínimo
+                        if (totalPlayers > minPlayers) totalPlayers--
                     }
 
-                    // Número de jugadores
                     Text(
-                        text = "$playersPerTeam",
+                        text = "$totalPlayers",
                         fontSize = playerTextSize,
                         fontFamily = customFont,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
 
-                    // Flecha derecha ➕
-                    ImagenBoton(
-                        drawableId = R.drawable.right,
-                        modifier = Modifier.size(45.dp)
-                    ) {
-                        playersPerTeam++
+                    ImagenBoton(R.drawable.right, Modifier.size(45.dp)) {
+                        totalPlayers++ // 👆 Aumenta de uno en uno
                     }
                 }
             }
@@ -199,31 +186,22 @@ class MainActivity : ComponentActivity() {
                 ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
                     val intent = Intent(this@MainActivity, TeamsActivity::class.java)
                     intent.putExtra("teams", teams)
+                    intent.putExtra("totalPlayers", totalPlayers)
                     intent.putExtra("category", selectedCategory.name)
                     startActivity(intent)
                 }
-
-
             }
         }
     }
 
-    // 🔸 Botón de imagen reutilizable
+    // ✅ Cada equipo mínimo 2 jugadores → total mínimo = equipos * 2
+    fun calculateMinPlayers(teams: Int): Int = teams * 2
+
     @Composable
     fun ImagenBoton(drawableId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
         buttonAnimation(drawableId = drawableId, onClick = onClick, modifier = modifier)
     }
 
-    // 🔸 Cálculo de jugadores mínimos según equipos
-    fun calculateMinPlayers(teams: Int): Int = when (teams) {
-        2 -> 4
-        3 -> 6
-        4 -> 8
-        5 -> 10
-        else -> 4
-    }
-
-    // 🔸 Botones de categoría
     @Composable
     fun CategoryButton(
         text: String,
@@ -253,7 +231,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // 🔸 Botones de equipo
     @Composable
     fun TeamButton(
         number: Int,
