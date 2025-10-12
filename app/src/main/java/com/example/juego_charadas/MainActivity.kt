@@ -20,13 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.core.graphics.toColorInt
 import com.example.juego_charadas.model.Category
 import com.example.juego_charadas.ui.theme.buttonAnimation
 
 class MainActivity : ComponentActivity() {
-
-    private var selectedCategory: Category = Category.Animals
-    private var teams: Int = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,18 +35,27 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun ScreenPrincipal() {
-
         var selectedCategory by remember { mutableStateOf(Category.Animals) }
         var teams by remember { mutableStateOf(2) }
 
+        // Estados para jugadores
+        var minPlayers by remember { mutableStateOf(calculateMinPlayers(teams)) }
+        var playersPerTeam by remember { mutableStateOf(minPlayers) }
+
+        // 🔹 Cada vez que cambia la cantidad de equipos, reinicia los valores correctamente
+        LaunchedEffect(teams) {
+            minPlayers = calculateMinPlayers(teams)
+            playersPerTeam = minPlayers
+        }
+
+        // Tipografías y colores
         val customFont = FontFamily(Font(R.font.wonderian))
-        val colorSeleccionado = Color(android.graphics.Color.parseColor("#1798C9"))
-        val colorNormal = Color(android.graphics.Color.parseColor("#1EC0FF"))
+        val colorSeleccionado = Color("#1798C9".toColorInt())
+        val colorNormal = Color("#1EC0FF".toColorInt())
 
         val sizeCategoria = 22.sp
         val sizeEquipos = 50.sp
         val playerTextSize = 70.sp
-
 
         Image(
             painter = painterResource(id = R.drawable.fondo),
@@ -64,7 +71,7 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
 
-
+            // 🟣 Caja morada (Categorías)
             Box(
                 modifier = Modifier
                     .size(230.dp, 260.dp)
@@ -103,17 +110,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-
-            var playersPerTeam by remember { mutableStateOf(2) }
-            val minPlayers = 2
-
+            // 🟡 Caja amarilla (jugadores)
             Box(
                 modifier = Modifier
                     .size(200.dp)
                     .offset(x = -80.dp, y = 227.dp),
                 contentAlignment = Alignment.Center
             ) {
-
                 Image(
                     painter = painterResource(id = R.drawable.yellowbackground),
                     contentDescription = null,
@@ -129,15 +132,15 @@ class MainActivity : ComponentActivity() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
+                    // Flecha izquierda ➖
                     ImagenBoton(
                         drawableId = R.drawable.left,
                         modifier = Modifier.size(45.dp)
                     ) {
                         if (playersPerTeam > minPlayers) playersPerTeam--
-                        CalculatePlayers(playersPerTeam)
                     }
 
-
+                    // Número de jugadores
                     Text(
                         text = "$playersPerTeam",
                         fontSize = playerTextSize,
@@ -146,18 +149,17 @@ class MainActivity : ComponentActivity() {
                         color = Color.White
                     )
 
-
+                    // Flecha derecha ➕
                     ImagenBoton(
                         drawableId = R.drawable.right,
                         modifier = Modifier.size(45.dp)
                     ) {
                         playersPerTeam++
-                        CalculatePlayers(playersPerTeam)
                     }
                 }
             }
 
-
+            // 🔵 Caja azul (equipos)
             Box(
                 modifier = Modifier
                     .size(200.dp)
@@ -177,69 +179,29 @@ class MainActivity : ComponentActivity() {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        TeamButton(
-                            number = 2,
-                            isSelected = teams == 2,
-                            customFont = customFont,
-                            fontSize = sizeEquipos,
-                            selectedColor = colorSeleccionado,
-                            normalColor = colorNormal
-                        ) {
-                            teams = 2
-                            CalculatePlayers(4)
-                        }
-
-                        TeamButton(
-                            number = 3,
-                            isSelected = teams == 3,
-                            customFont = customFont,
-                            fontSize = sizeEquipos,
-                            selectedColor = colorSeleccionado,
-                            normalColor = colorNormal
-                        ) {
-                            teams = 3
-                            CalculatePlayers(6)
-                        }
+                        TeamButton(2, teams == 2, customFont, sizeEquipos, colorSeleccionado, colorNormal) { teams = 2 }
+                        TeamButton(3, teams == 3, customFont, sizeEquipos, colorSeleccionado, colorNormal) { teams = 3 }
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                        TeamButton(
-                            number = 4,
-                            isSelected = teams == 4,
-                            customFont = customFont,
-                            fontSize = sizeEquipos,
-                            selectedColor = colorSeleccionado,
-                            normalColor = colorNormal
-                        ) {
-                            teams = 4
-                            CalculatePlayers(8)
-                        }
-
-                        TeamButton(
-                            number = 5,
-                            isSelected = teams == 5,
-                            customFont = customFont,
-                            fontSize = sizeEquipos,
-                            selectedColor = colorSeleccionado,
-                            normalColor = colorNormal
-                        ) {
-                            teams = 5
-                            CalculatePlayers(10)
-                        }
+                        TeamButton(4, teams == 4, customFont, sizeEquipos, colorSeleccionado, colorNormal) { teams = 4 }
+                        TeamButton(5, teams == 5, customFont, sizeEquipos, colorSeleccionado, colorNormal) { teams = 5 }
                     }
                 }
             }
 
-
+            // 🟢 Botón de inicio
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .offset(y = (-20).dp)
             ) {
                 ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
-                    val intent = Intent(this@MainActivity, TeamsActivity::class.java)
-                    intent.putExtra("teams", teams)
-                    intent.putExtra("category", selectedCategory.name)
+                    val intent = Intent(this@MainActivity, TeamsActivity::class.java).apply {
+                        putExtra("teams", teams)
+                        putExtra("category", selectedCategory.name)
+                        putExtra("players", playersPerTeam)
+                    }
                     startActivity(intent)
                 }
 
@@ -247,16 +209,22 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
+    // 🔸 Botón de imagen reutilizable
     @Composable
     fun ImagenBoton(drawableId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
         buttonAnimation(drawableId = drawableId, onClick = onClick, modifier = modifier)
     }
 
-    fun CalculatePlayers(players: Int) {
-
+    // 🔸 Cálculo de jugadores mínimos según equipos
+    fun calculateMinPlayers(teams: Int): Int = when (teams) {
+        2 -> 4
+        3 -> 6
+        4 -> 8
+        5 -> 10
+        else -> 4
     }
 
+    // 🔸 Botones de categoría
     @Composable
     fun CategoryButton(
         text: String,
@@ -268,7 +236,6 @@ class MainActivity : ComponentActivity() {
         onClick: () -> Unit
     ) {
         val buttonColor = if (isSelected) selectedColor else normalColor
-
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
@@ -287,6 +254,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // 🔸 Botones de equipo
     @Composable
     fun TeamButton(
         number: Int,
@@ -298,7 +266,6 @@ class MainActivity : ComponentActivity() {
         onClick: () -> Unit
     ) {
         val buttonColor = if (isSelected) selectedColor else normalColor
-
         Button(
             onClick = onClick,
             colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
