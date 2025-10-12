@@ -242,6 +242,7 @@ class MainActivity : ComponentActivity() {
                     intent.putExtra("category", selectedCategory.name)
                     startActivity(intent)
                 }
+
             }
         }
     }

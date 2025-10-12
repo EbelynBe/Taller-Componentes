@@ -12,11 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Juego_Charadas">
 
-        <!-- Pantalla de selección de equipos -->
-        <activity
-            android:name=".TeamsActivity"
-            android:exported="false" />
-
         <!-- Pantalla principal -->
         <activity
             android:name=".MainActivity"
@@ -28,6 +23,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Pantalla de cuenta regresiva -->
+        <activity
+            android:name=".CountdownActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+
+        <!-- Pantalla de selección de equipos -->
+        <activity
+            android:name=".TeamsActivity"
+            android:exported="false" />
+
 
         <!-- Juego -->
         <activity

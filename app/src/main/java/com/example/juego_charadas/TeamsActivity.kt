@@ -40,10 +40,12 @@ class TeamsActivity : ComponentActivity() {
                 customFont = customFont,
                 onBack = { finish() },
                 onStartGame = {
-                    val intent = Intent(this, GameActivity::class.java)
+                    val intent = Intent(this, CountdownActivity::class.java)
                     intent.putExtra("teams", teams)
+                    intent.putExtra("category", category)
                     startActivity(intent)
                 }
+
             )
         }
     }
