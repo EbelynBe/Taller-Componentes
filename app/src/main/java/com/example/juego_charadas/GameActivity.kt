@@ -36,13 +36,30 @@ class GameActivity : ComponentActivity() {
     fun GameScreen(teams: Int) {
         val wonderian = FontFamily(Font(R.font.wonderian))
 
+        // 🔹 Recibe la categoría enviada
+        val category = intent.getStringExtra("category") ?: "Animals"
+
+        // 🔹 Listas de palabras
         val animals = listOf("Dog", "Cat", "Elephant", "Lion", "Tiger", "Monkey", "Horse", "Rabbit")
         val food = listOf("Pizza", "Burger", "Salad", "Pasta", "Ice cream", "Sushi", "Hot dog", "Cake")
         val professions = listOf("Doctor", "Teacher", "Engineer", "Firefighter", "Pilot", "Chef", "Police officer", "Musician")
         val movies = listOf("Titanic", "Avatar", "Frozen", "Inception", "Spiderman", "Toy Story", "The Lion King", "Batman")
+        val actors = listOf("dana", "hola")
 
-        val selectedWord = professions.random()
+        // 🔹 Selecciona la lista según la categoría elegida
+        val selectedWordList = when (category) {
+            "Animals" -> animals
+            "Food" -> food
+            "Professions" -> professions
+            "Movies" -> movies
+            "Actors" -> actors
+            else -> animals
+        }
 
+        // 🔹 Elige una palabra aleatoria de la categoría seleccionada
+        val selectedWord = selectedWordList.random()
+
+        // 🔹 Colores de fondo
         val colors = listOf(
             Color(0xFFFFCDD2),
             Color(0xFFC8E6C9),
@@ -58,7 +75,6 @@ class GameActivity : ComponentActivity() {
                 .fillMaxSize()
                 .background(backgroundColor)
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -66,7 +82,6 @@ class GameActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
@@ -78,9 +93,7 @@ class GameActivity : ComponentActivity() {
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
-
             }
-
 
             Box(
                 modifier = Modifier
@@ -92,9 +105,9 @@ class GameActivity : ComponentActivity() {
                     finish()
                 }
             }
-
         }
     }
+
 
     @Composable
     fun ImageButton(drawableId: Int, onClick: () -> Unit) {

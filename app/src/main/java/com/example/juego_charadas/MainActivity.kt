@@ -67,7 +67,8 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
 
-            // 🟣 Caja morada (Categorías)
+
+            // 🟣 Caja morada (selector de categorías con flechas)
             Box(
                 modifier = Modifier
                     .size(230.dp, 260.dp)
@@ -81,27 +82,48 @@ class MainActivity : ComponentActivity() {
                     contentScale = ContentScale.FillBounds
                 )
 
-                Column(
+                // Lista de categorías disponibles
+                val categories = Category.values()
+                var currentIndex by remember { mutableStateOf(0) }
+
+                // Sincronizar con el valor actual
+                LaunchedEffect(selectedCategory) {
+                    currentIndex = categories.indexOf(selectedCategory)
+                }
+
+                Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    listOf(
-                        "Food" to Category.Food,
-                        "Movies" to Category.Movies,
-                        "Professions" to Category.Professions,
-                        "Animals" to Category.Animals
-                    ).forEach { (text, category) ->
-                        CategoryButton(
-                            text = text,
-                            isSelected = selectedCategory == category,
-                            customFont = customFont,
-                            fontSize = sizeCategoria,
-                            selectedColor = colorSeleccionado,
-                            normalColor = colorNormal
-                        ) { selectedCategory = category }
+                    // Flecha izquierda
+                    ImagenBoton(
+                        drawableId = R.drawable.left,
+                        modifier = Modifier.size(45.dp)
+                    ) {
+                        currentIndex = if (currentIndex > 0) currentIndex - 1 else categories.size - 1
+                        selectedCategory = categories[currentIndex]
+                    }
+
+                    // Nombre de categoría (animado)
+                    Text(
+                        text = categories[currentIndex].name,
+                        fontSize = 30.sp,
+                        fontFamily = customFont,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+
+                    // Flecha derecha
+                    ImagenBoton(
+                        drawableId = R.drawable.right,
+                        modifier = Modifier.size(45.dp)
+                    ) {
+                        currentIndex = if (currentIndex < categories.size - 1) currentIndex + 1 else 0
+                        selectedCategory = categories[currentIndex]
                     }
                 }
             }
