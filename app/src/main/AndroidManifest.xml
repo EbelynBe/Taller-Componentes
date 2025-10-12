@@ -35,6 +35,10 @@
             android:screenOrientation="landscape"
             android:exported="false" />
 
+        <activity
+            android:name=".CountdownActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
 
 
     </application>

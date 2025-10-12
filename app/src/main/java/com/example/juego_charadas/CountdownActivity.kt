@@ -43,7 +43,6 @@ class CountdownActivity : ComponentActivity() {
 
 @Composable
 fun CountdownScreen(onFinish: () -> Unit) {
-
     var currentCount by remember { mutableStateOf(3) }
 
     // 🎨 Fuente personalizada Wonderian
@@ -82,7 +81,7 @@ fun CountdownScreen(onFinish: () -> Unit) {
             text = if (currentCount > 0) currentCount.toString() else "¡Let's go!!",
             fontSize = 100.sp,
             fontWeight = FontWeight.Bold,
-            fontFamily = wonderian,
+            fontFamily = wonderian, // 👈 Aplicamos la fuente Wonderian
             color = Color.White,
             modifier = Modifier.scale(scale)
         )

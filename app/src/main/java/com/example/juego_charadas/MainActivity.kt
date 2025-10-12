@@ -197,13 +197,12 @@ class MainActivity : ComponentActivity() {
                     .offset(y = (-20).dp)
             ) {
                 ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
-                    val intent = Intent(this@MainActivity, TeamsActivity::class.java).apply {
-                        putExtra("teams", teams)
-                        putExtra("category", selectedCategory.name)
-                        putExtra("players", playersPerTeam)
-                    }
+                    val intent = Intent(this@MainActivity, TeamsActivity::class.java)
+                    intent.putExtra("teams", teams)
+                    intent.putExtra("category", selectedCategory.name)
                     startActivity(intent)
                 }
+
 
             }
         }
