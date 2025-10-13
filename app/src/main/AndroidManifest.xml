@@ -11,13 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Juego_Charadas">
-
-        <!-- Pantalla de selección de equipos -->
+        <activity
+            android:name=".ResultsActivity"
+            android:exported="false" />
         <activity
             android:name=".TeamsActivity"
             android:exported="false" />
-
-        <!-- Pantalla principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -25,22 +24,18 @@
             android:theme="@style/Theme.Juego_Charadas">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Juego -->
         <activity
             android:name=".GameActivity"
-            android:screenOrientation="landscape"
-            android:exported="false" />
-
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".CountdownActivity"
             android:exported="false"
             android:screenOrientation="landscape" />
-
-
     </application>
 
 </manifest>

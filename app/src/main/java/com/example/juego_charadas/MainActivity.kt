@@ -67,8 +67,6 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
 
-
-            // 🟣 Caja morada (selector de categorías con flechas)
             Box(
                 modifier = Modifier
                     .size(230.dp, 260.dp)

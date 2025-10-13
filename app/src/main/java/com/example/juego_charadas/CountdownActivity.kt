@@ -19,20 +19,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.ui.draw.scale
+import com.example.juego_charadas.model.Team
 
 class CountdownActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val teamsList = intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
+        val category = intent.getStringExtra("category") ?: "Sin categoría"
         val teams = intent.getIntExtra("teams", 2)
-        val category = intent.getStringExtra("category")
+
 
         setContent {
             CountdownScreen(
                 onFinish = {
                     val intent = Intent(this, GameActivity::class.java)
-                    intent.putExtra("teams", teams)
+                    intent.putExtra("teamsList", teamsList)
                     intent.putExtra("category", category)
+                    intent.putExtra("teams", teams)
                     startActivity(intent)
                     finish()
                 }

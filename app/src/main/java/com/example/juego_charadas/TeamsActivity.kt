@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -30,15 +32,15 @@ class TeamsActivity : ComponentActivity() {
         val totalPlayers = intent.getIntExtra("totalPlayers", 2)
         val category = intent.getStringExtra("category") ?: "Sin categoría"
 
-        // 🧮 Distribuir jugadores equitativamente entre equipos
         val playersDistribution = distributePlayersAcrossTeams(totalPlayers, numTeams)
-        val teamsList = playersDistribution.map { count -> Team(players = count, points = 0) }
 
         val customFont = FontFamily(Font(R.font.wonderian))
 
+        val baseTeams = playersDistribution.map { count -> Team(players = count, points = 0) }
+
         setContent {
             TeamsSelector(
-                teamsList = teamsList,
+                baseTeams = baseTeams,
                 categoryName = category,
                 customFont = customFont,
                 onBack = { finish() },
@@ -46,6 +48,7 @@ class TeamsActivity : ComponentActivity() {
                     val intent = Intent(this, CountdownActivity::class.java)
                     intent.putExtra("teams", numTeams)
                     intent.putExtra("category", category)
+                    intent.putExtra("teamsList", ArrayList(baseTeams))
                     startActivity(intent)
                 }
             )
@@ -62,13 +65,9 @@ class TeamsActivity : ComponentActivity() {
 }
 
 @Composable
-fun TeamsSelector(
-    teamsList: List<Team>,
-    categoryName: String,
-    customFont: FontFamily,
-    onBack: () -> Unit,
-    onStartGame: () -> Unit
+fun TeamsSelector(baseTeams: List<Team>, categoryName: String, customFont: FontFamily, onBack: () -> Unit, onStartGame: () -> Unit
 ) {
+    val teamsList = remember { mutableStateListOf<Team>().apply { addAll(baseTeams) } }
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = R.drawable.fondo),
@@ -150,7 +149,7 @@ fun TeamsSelector(
             }
         }
 
-        // 🔙 Botón atrás
+        // Botón atrás
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -164,7 +163,7 @@ fun TeamsSelector(
             )
         }
 
-        // ▶️ Botón iniciar
+        // Botón iniciar
         Box(
             modifier = Modifier
                 .fillMaxSize()
