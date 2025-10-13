@@ -16,7 +16,7 @@ import java.io.Serializable
 
 class Game(private val category: String, private val teamsList: MutableList<Team>) : Serializable {
     val teams get() = teamsList
-    private val timeLimit = 60
+    private val timeLimit = 5 //mientras
     private var job: Job? = null
 
     // mejor: _gameFinished privado, gameFinished expuesto como State
@@ -39,7 +39,8 @@ class Game(private val category: String, private val teamsList: MutableList<Team
     private val food = listOf("Pizza", "Burger", "Salad", "Pasta", "Ice cream", "Sushi", "Hot dog", "Cake")
     private val professions = listOf("Doctor", "Teacher", "Engineer", "Firefighter", "Pilot", "Chef", "Police officer", "Musician")
     private val movies = listOf("Titanic", "Avatar", "Frozen", "Inception", "Spiderman", "Toy Story", "The Lion King", "Batman")
-    private val actors = listOf("dana", "hola")
+    private val actors = listOf("Leonardo DiCaprio", "Emma Stone", "Tom Hanks", "Zendaya", "Brad Pitt", "Natalie Portman", "Will Smith", "Anne Hathaway")
+
 
     private val selectedWordList = when (category) {
         "Animals" -> animals
@@ -54,7 +55,7 @@ class Game(private val category: String, private val teamsList: MutableList<Team
         private set
 
     fun nextWord() {
-        currentTeam.points++  // sumas un punto al equipo
+        //currentTeam.points++   sumas un punto al equipo(lo quite mientras para poner los dos botones )
         selectedWord = selectedWordList.random()
 
         // Log para depurar los puntos

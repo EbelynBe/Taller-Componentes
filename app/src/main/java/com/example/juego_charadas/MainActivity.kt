@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
                     // Flecha izquierda
                     ImagenBoton(
                         drawableId = R.drawable.left,
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier.size(37.dp)
                     ) {
                         currentIndex = if (currentIndex > 0) currentIndex - 1 else categories.size - 1
                         selectedCategory = categories[currentIndex]
@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity() {
                     // Nombre de categoría (animado)
                     Text(
                         text = categories[currentIndex].name,
-                        fontSize = 30.sp,
+                        fontSize = 27.sp,
                         fontFamily = customFont,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                     // Flecha derecha
                     ImagenBoton(
                         drawableId = R.drawable.right,
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier.size(37.dp)
                     ) {
                         currentIndex = if (currentIndex < categories.size - 1) currentIndex + 1 else 0
                         selectedCategory = categories[currentIndex]
