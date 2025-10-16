@@ -28,29 +28,29 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { ScreenPrincipal() } // Loads the main screen composable
+        setContent { ScreenPrincipal() } // Load main screen
     }
 
     @Composable
     fun ScreenPrincipal() {
-        // --- State variables ---
+        // State variables
         var selectedCategory by remember { mutableStateOf(Category.Animals) }
         var teams by remember { mutableStateOf(2) }
         var minPlayers by remember { mutableStateOf(calculateMinPlayers(teams)) }
         var totalPlayers by remember { mutableStateOf(minPlayers) }
 
-        // Whenever the number of teams changes, recalculate min players
+        // Recalculate players when team count changes
         LaunchedEffect(teams) {
             minPlayers = calculateMinPlayers(teams)
             totalPlayers = minPlayers
         }
 
-        // Custom font and color setup
+        // Custom font and colors
         val customFont = FontFamily(Font(R.font.wonderian))
         val colorSelected = Color("#1798C9".toColorInt())
         val colorNormal = Color("#1EC0FF".toColorInt())
 
-        // --- Background image ---
+        // Background image
         Image(
             painter = painterResource(id = R.drawable.fondo),
             contentDescription = null,
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
             contentScale = ContentScale.Crop
         )
 
-        // --- Game title image (CHARADES) ---
+        // Title image
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // --- Main content area ---
+        // Main content
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,9 +83,7 @@ class MainActivity : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
 
-            // ==========================
-            // CATEGORY SELECTION SECTION
-            // ==========================
+            // --- Category selection ---
             Box(
                 modifier = Modifier
                     .size(240.dp, 200.dp)
@@ -113,12 +111,12 @@ class MainActivity : ComponentActivity() {
                 val categories = Category.values()
                 var currentIndex by remember { mutableStateOf(0) }
 
-                // Keep track of current category index
+                // Track current category
                 LaunchedEffect(selectedCategory) {
                     currentIndex = categories.indexOf(selectedCategory)
                 }
 
-                // Arrows + current category text
+                // Arrows and text
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -126,13 +124,13 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Left arrow: go to previous category
+                    // Left arrow
                     ImagenBoton(R.drawable.left, Modifier.size(37.dp)) {
                         currentIndex = if (currentIndex > 0) currentIndex - 1 else categories.size - 1
                         selectedCategory = categories[currentIndex]
                     }
 
-                    // Current category name
+                    // Category name
                     Text(
                         text = categories[currentIndex].name,
                         fontSize = 27.sp,
@@ -141,7 +139,7 @@ class MainActivity : ComponentActivity() {
                         fontWeight = FontWeight.Bold
                     )
 
-                    // Right arrow: go to next category
+                    // Right arrow
                     ImagenBoton(R.drawable.right, Modifier.size(37.dp)) {
                         currentIndex = if (currentIndex < categories.size - 1) currentIndex + 1 else 0
                         selectedCategory = categories[currentIndex]
@@ -149,9 +147,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // ==========================
-            // PLAYER SELECTION SECTION
-            // ==========================
+            // --- Player selection ---
             Box(
                 modifier = Modifier
                     .size(200.dp)
@@ -176,7 +172,7 @@ class MainActivity : ComponentActivity() {
                         .offset(y = (-40).dp)
                 )
 
-                // Arrows to increase/decrease total players
+                // Arrows and player number
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
@@ -184,10 +180,12 @@ class MainActivity : ComponentActivity() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    // Decrease players
                     ImagenBoton(R.drawable.left, Modifier.size(45.dp)) {
                         if (totalPlayers > minPlayers) totalPlayers--
                     }
 
+                    // Player number
                     Text(
                         text = "$totalPlayers",
                         fontSize = 70.sp,
@@ -196,15 +194,14 @@ class MainActivity : ComponentActivity() {
                         color = Color.White
                     )
 
+                    // Increase players
                     ImagenBoton(R.drawable.right, Modifier.size(45.dp)) {
                         totalPlayers++
                     }
                 }
             }
 
-            // ==========================
-            // TEAM SELECTION SECTION
-            // ==========================
+            // --- Team selection ---
             Box(
                 modifier = Modifier
                     .size(200.dp)
@@ -229,7 +226,7 @@ class MainActivity : ComponentActivity() {
                         .offset(y = (-40).dp)
                 )
 
-                // Grid of selectable team count buttons
+                // Buttons grid
                 Column(
                     modifier = Modifier.size(160.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -247,15 +244,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            // ==========================
-            // START BUTTON SECTION
-            // ==========================
+            // --- Start button ---
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .offset(y = (-20).dp)
             ) {
-                // Starts the TeamsActivity and sends chosen settings
+                // Go to TeamsActivity
                 ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
                     val intent = Intent(this@MainActivity, TeamsActivity::class.java)
                     intent.putExtra("teams", teams)
@@ -267,16 +262,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Calculates the minimum number of players depending on team count
+    // Calculate minimum players per team
     fun calculateMinPlayers(teams: Int): Int = teams * 2
 
-    // Wrapper for animated image buttons (used for arrows and start)
+    // Wrapper for animated buttons
     @Composable
     fun ImagenBoton(drawableId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
         buttonAnimation(drawableId = drawableId, onClick = onClick, modifier = modifier)
     }
 
-    // Generic category button (not used here, but useful for category menus)
+    // Category button (not used here)
     @Composable
     fun CategoryButton(
         text: String,
@@ -306,7 +301,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Button used for selecting number of teams
+    // Button for selecting team number
     @Composable
     fun TeamButton(
         number: Int,

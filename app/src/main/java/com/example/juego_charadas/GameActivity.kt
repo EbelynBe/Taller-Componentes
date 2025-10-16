@@ -29,32 +29,36 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Get category and teams list
+        // Get category and teams from the previous screen
         val category = intent.getStringExtra("category") ?: "Animals"
         val teamsList =
             intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
-        // val numTeams = teamsList.size
-        // val totalPlayers = teamsList.sumOf { it.players }
+
+        // Create a new game instance
         game = Game(category, teamsList)
 
+        // Set up the game screen
         setContent {
-            GameScreen(game, onFinish = { result ->
-                val intent = Intent(this, ResultsActivity::class.java)
-                intent.putExtra("category", category)
-                intent.putExtra("teamsList", ArrayList(teamsList))
-                intent.putExtra("result", result)
-                startActivity(intent)
-                finish()
-            },
+            GameScreen(
+                game,
+                onFinish = { result ->
+                    // Go to the results screen
+                    val intent = Intent(this, ResultsActivity::class.java)
+                    intent.putExtra("category", category)
+                    intent.putExtra("teamsList", ArrayList(teamsList))
+                    intent.putExtra("result", result)
+                    startActivity(intent)
+                    finish()
+                },
                 onTeamsActivity = {
+                    // Return to the teams screen
                     val intent = Intent(this, TeamsActivity::class.java)
                     intent.putExtra("category", category)
-                    //intent.putExtra("totalPlayers", totalPlayers)
-                    //intent.putExtra("teams", numTeams)
                     intent.putExtra("teamsList", ArrayList(teamsList))
                     startActivity(intent)
                     finish()
-                })
+                }
+            )
         }
     }
 
@@ -62,10 +66,12 @@ class GameActivity : ComponentActivity() {
     fun GameScreen(game: Game, onFinish: (Int) -> Unit, onTeamsActivity: () -> Unit) {
         val wonderian = FontFamily(Font(R.font.wonderian))
 
+        // Observe game data (seconds, team, word)
         val seconds by game.seconds
         val teamIndex by game.currentTeamIndex
         val word = game.selectedWord
 
+        // Background color options
         val colors = listOf(
             Color(0xFFFFCDD2),
             Color(0xFFC8E6C9),
@@ -78,33 +84,32 @@ class GameActivity : ComponentActivity() {
         var showNextTeamScreen by remember { mutableStateOf(false) }
         var backgroundColor by remember { mutableStateOf(colors.random()) }
 
-        // Change background color when word changes
+        // Change color each time the word changes
         LaunchedEffect(word) {
             backgroundColor = colors.random()
         }
 
-        // Start game timer
+        // Start the game timer
         LaunchedEffect(Unit) {
             game.startTimer { showNextTeamScreen = true }
         }
 
-        // Go to results if game ends
+        // If the game is finished, show results
         if (game.gameFinished.value) {
             LaunchedEffect(Unit) {
-                val result : Int = game.results()
+                val result: Int = game.results()
                 onFinish(result)
             }
         }
 
         if (showNextTeamScreen) {
-            // If all teams have played, go to results
+            // Show next team screen or results if all played
             if (teamIndex + 1 >= game.teams.size) {
                 LaunchedEffect(Unit) {
-                    val result : Int = game.results()
+                    val result: Int = game.results()
                     onFinish(result)
                 }
             } else {
-                // Next team screen
                 NextTeamScreen(
                     teamNumber = (teamIndex + 1),
                     teamName = "Team ${(teamIndex + 2)}",
@@ -118,14 +123,14 @@ class GameActivity : ComponentActivity() {
                 )
             }
         } else {
-            // Main game screen
+            // Main gameplay screen
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColor)
                     .padding(16.dp)
             ) {
-                // Display team info and time
+                // Show time, team, and points
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -156,7 +161,7 @@ class GameActivity : ComponentActivity() {
                     )
                 }
 
-                //Buttons (pause / restart / continue)
+                // Pause, restart, and continue buttons
                 var showContinue by remember { mutableStateOf(false) }
                 var p by remember { mutableStateOf(true) }
 
@@ -198,8 +203,8 @@ class GameActivity : ComponentActivity() {
                     }
                 }
 
-                // Display word and correct/wrong buttons
-                if(p) {
+                // Main word and correct/wrong buttons
+                if (p) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -234,7 +239,8 @@ class GameActivity : ComponentActivity() {
                             game.nextWord(1)
                         }
                     }
-                }else{
+                } else {
+                    // Pause state emoji
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -250,7 +256,7 @@ class GameActivity : ComponentActivity() {
                     }
                 }
 
-                // Home button
+                // Home button to go back to team selection
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -278,6 +284,7 @@ class GameActivity : ComponentActivity() {
     ) {
         val wonderian = FontFamily(Font(R.font.wonderian))
 
+        // Screen that appears between turns
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -288,7 +295,6 @@ class GameActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Display next turn text
                 Text(
                     text = "Next Turn:",
                     fontFamily = wonderian,
@@ -303,7 +309,6 @@ class GameActivity : ComponentActivity() {
                     fontWeight = FontWeight.ExtraBold
                 )
                 Spacer(modifier = Modifier.height(32.dp))
-                // Continue button
                 Button(onClick = onContinue) {
                     Text(
                         text = "Continue",
@@ -321,7 +326,7 @@ class GameActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
         onClick: () -> Unit
     ) {
-        // Button with image
+        // Reusable image button with animation
         buttonAnimation(
             drawableId = drawableId,
             onClick = onClick,

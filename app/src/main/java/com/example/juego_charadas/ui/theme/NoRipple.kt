@@ -17,29 +17,33 @@ import androidx.compose.foundation.clickable
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun buttonAnimation(
-    drawableId: Int,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    drawableId: Int, // Image resource ID for the button
+    modifier: Modifier = Modifier, // Optional modifier for size or positioning
+    onClick: () -> Unit = {} // Action executed when the button is clicked
 ) {
+    // Detects user interaction (whether the button is pressed)
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Smooth scale animation: enlarges when pressed, returns to normal when released
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 1.1f else 1f,
         label = "scaleAnimation"
     )
 
+    // Displays the image that behaves like a button with an animation
     Image(
-        painter = painterResource(id = drawableId),
-        contentDescription = null,
-        contentScale = ContentScale.Fit,
+        painter = painterResource(id = drawableId), // Loads the image from resources
+        contentDescription = null, // No description since it’s decorative
+        contentScale = ContentScale.Fit, // Keeps image proportions
         modifier = modifier
-            .size(90.dp)
-            .scale(scale)
+            .size(90.dp) // Sets the button size
+            .scale(scale) // Applies the zoom animation
             .clickable(
-                interactionSource = interactionSource,
-                indication = null
+                interactionSource = interactionSource, // Handles press detection
+                indication = null // Disables ripple effect for a cleaner look
             ) {
-                onClick()
+                onClick() // Executes the action when clicked
             }
     )
 }
