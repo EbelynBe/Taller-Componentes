@@ -14,12 +14,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.Serializable
 
+// This class handles the main game logic for the charades game.
+// It manages the timer, the teams, turns, and word selection based on the chosen category.
 class Game(private val category: String, private val teamsList: MutableList<Team>) : Serializable {
     val teams get() = teamsList
-    private val timeLimit = 5 //
+    private val timeLimit = 5 // Time limit per round (in seconds)
     private var job: Job? = null
 
-    // mejor: _gameFinished privado, gameFinished expuesto como State
+    // better: _gameFinished is private, gameFinished is exposed as a read-only State
     private val _gameFinished = mutableStateOf(false)
     val gameFinished: State<Boolean> get() = _gameFinished
 
@@ -34,14 +36,14 @@ class Game(private val category: String, private val teamsList: MutableList<Team
     val currentTeam: Team
         get() = teamsList[_currentTeamIndex.value]
 
-    // listas...
+    // Word lists (used depending on the selected category)
     private val animals = listOf("Dog", "Cat", "Elephant", "Lion", "Tiger", "Monkey", "Horse", "Rabbit")
     private val food = listOf("Pizza", "Burger", "Salad", "Pasta", "Ice cream", "Sushi", "Hot dog", "Cake")
     private val professions = listOf("Doctor", "Teacher", "Engineer", "Firefighter", "Pilot", "Chef", "Police officer", "Musician")
     private val movies = listOf("Titanic", "Avatar", "Frozen", "Inception", "Spiderman", "Toy Story", "The Lion King", "Batman")
     private val actors = listOf("Leonardo DiCaprio", "Emma Stone", "Tom Hanks", "Zendaya", "Brad Pitt", "Natalie Portman", "Will Smith", "Anne Hathaway")
 
-
+    //Selects the word list based on the category chosen by the user
     private val selectedWordList = when (category) {
         "Animals" -> animals
         "Food" -> food
@@ -50,26 +52,30 @@ class Game(private val category: String, private val teamsList: MutableList<Team
         "Actors" -> actors
         else -> animals
     }
-
+    //Current selected word (randomly chosen from the category list)
     var selectedWord by mutableStateOf(selectedWordList.random())
         private set
 
+    //Called when moving to the next word
+    //If num == 1, the team scores a point (used when the answer is correct)
+    // Then a new random word is selected
     fun nextWord(num: Int) {
         if(num == 1){
-            currentTeam.points++   // sumas un punto al equipo(lo quite mientras para poner los dos botones )
+            currentTeam.points++   // adds a point to the team
         }
         selectedWord = selectedWordList.random()
 
-        // Log para depurar los puntos
+        //  Log for debugging team points
         teamsList.forEachIndexed { index, team ->
             Log.d("GameDebug", "Equipo ${index + 1}: ${team.points} puntos")
         }
     }
-
+    //Starts the round timer
+    //When time is up, calls the onTimeOver() callback
     fun startTimer(onTimeOver: () -> Unit = {}) {
         if (isRunning.value) return
         isRunning.value = true
-        // reiniciamos segundos al comenzar
+        // reset seconds when starting
         seconds.value = 0
 
         job = CoroutineScope(Dispatchers.Default).launch {
@@ -87,17 +93,20 @@ class Game(private val category: String, private val teamsList: MutableList<Team
         }
     }
 
+    //Stops the timer
     fun stopTimer() {
         isRunning.value = false
         job?.cancel()
         job = null
     }
 
+    //Resets the timer (stops it and sets seconds to 0)
     fun resetTimer() {
         stopTimer()
         seconds.value = 0
     }
-
+    //Moves to the next team or finishes the game if all teams have played
+    //Automatically restarts the timer for the next team
     fun nextTeam() {
         job?.cancel()
         job = null
