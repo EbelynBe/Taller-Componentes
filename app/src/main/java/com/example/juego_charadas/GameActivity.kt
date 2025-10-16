@@ -38,7 +38,7 @@ class GameActivity : ComponentActivity() {
         game = Game(category, teamsList)
 
         setContent {
-            GameScreen(game, onFinish = {
+            GameScreen(game, onFinish = { result ->
                 val intent = Intent(this, ResultsActivity::class.java)
                 intent.putExtra("category", category)
                 intent.putExtra("teamsList", ArrayList(teamsList))
@@ -156,7 +156,10 @@ class GameActivity : ComponentActivity() {
                     )
                 }
 
-                // Pause and restart buttons in a row
+                //Buttons (pause / restart / continue)
+                var showContinue by remember { mutableStateOf(false) }
+                var p by remember { mutableStateOf(true) }
+
                 Row(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -169,6 +172,8 @@ class GameActivity : ComponentActivity() {
                         modifier = Modifier.size(50.dp)
                     ) {
                         game.stopTimer()
+                        showContinue = true
+                        p = false
                     }
 
                     ImagenBoton(
@@ -177,42 +182,71 @@ class GameActivity : ComponentActivity() {
                     ) {
                         game.resetTimer()
                         game.startTimer { showNextTeamScreen = true }
+                        showContinue = false
+                        p = true
+                    }
+
+                    if (showContinue) {
+                        ImagenBoton(
+                            drawableId = R.drawable.restart,
+                            modifier = Modifier.size(50.dp)
+                        ) {
+                            game.startTimer { showNextTeamScreen = true }
+                            showContinue = false
+                            p = true
+                        }
                     }
                 }
 
                 // Display word and correct/wrong buttons
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .padding(horizontal = 30.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ImagenBoton(
-                        drawableId = R.drawable.wrong,
+                if(p) {
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .size(70.dp)
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .padding(horizontal = 30.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        game.nextWord(0)
+                        ImagenBoton(
+                            drawableId = R.drawable.wrong,
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .size(70.dp)
+                        ) {
+                            game.nextWord(0)
+                        }
+
+                        Text(
+                            text = word,
+                            fontFamily = wonderian,
+                            fontSize = 100.sp,
+                            color = Color.Black,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+
+                        ImagenBoton(
+                            drawableId = R.drawable.correct,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .size(70.dp)
+                        ) {
+                            game.nextWord(1)
+                        }
                     }
-
-                    Text(
-                        text = word,
-                        fontFamily = wonderian,
-                        fontSize = 100.sp,
-                        color = Color.Black,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-
-                    ImagenBoton(
-                        drawableId = R.drawable.correct,
+                }else{
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .size(70.dp)
+                            .fillMaxWidth()
+                            .align(Alignment.Center)
+                            .padding(horizontal = 30.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        game.nextWord(1)
+                        Text(
+                            text = "🙈",
+                            fontSize = 100.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
 
