@@ -54,8 +54,10 @@ class Game(private val category: String, private val teamsList: MutableList<Team
     var selectedWord by mutableStateOf(selectedWordList.random())
         private set
 
-    fun nextWord() {
-        //currentTeam.points++   sumas un punto al equipo(lo quite mientras para poner los dos botones )
+    fun nextWord(num: Int) {
+        if(num == 1){
+            currentTeam.points++   // sumas un punto al equipo(lo quite mientras para poner los dos botones )
+        }
         selectedWord = selectedWordList.random()
 
         // Log para depurar los puntos

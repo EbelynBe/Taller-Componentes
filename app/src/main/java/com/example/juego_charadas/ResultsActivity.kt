@@ -1,5 +1,6 @@
 package com.example.juego_charadas
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -17,20 +18,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.juego_charadas.model.Team
+import com.example.juego_charadas.ui.theme.buttonAnimation
 
 class ResultsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            //val teamsList = intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
-            //ResultScreen(teamsList)
-            ResultScreen()
+            val teamsList = intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
+            val category = intent.getStringExtra("category") ?: "Animals"
+            val numTeams = teamsList.size
+            ResultScreen(
+                onTeamsResults = {
+                    val intent = Intent(this, TeamsActivity::class.java)
+                    //intent.putExtra("teams", numTeams)
+                    //intent.putExtra("category", category)
+                    //intent.putExtra("teamsList", ArrayList(teamsList))
+                    startActivity(intent)
+                }
+            )
         }
     }
 }
 
 @Composable //teamsList: ArrayList<Team>
-fun ResultScreen() {
+fun ResultScreen(onTeamsResults : () -> Unit) {
     val wonderian = FontFamily(Font(R.font.wonderian))
 
     // 🎨 Degradado con colores de equipos (simulados)
@@ -91,5 +102,17 @@ fun ResultScreen() {
             //    }
             //}
         }
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        buttonAnimation(
+            drawableId = R.drawable.incio,
+            onClick = onTeamsResults,
+            modifier = Modifier.size(90.dp)
+        )
     }
 }

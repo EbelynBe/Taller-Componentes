@@ -38,6 +38,7 @@ class GameActivity : ComponentActivity() {
         setContent {
             GameScreen(game, onFinish = {
                 val intent = Intent(this, ResultsActivity::class.java)
+                intent.putExtra("category", category)
                 startActivity(intent) // 👈 SIN finish(), para que no se cierre GameActivity
             })
         }
@@ -91,7 +92,7 @@ class GameActivity : ComponentActivity() {
                 // Pantalla para el siguiente equipo
                 NextTeamScreen(
                     teamNumber = (teamIndex + 1),
-                    teamName = "Team ${(teamIndex + 1)}",
+                    teamName = "Team ${(teamIndex + 2)}",
                     backgroundColor = colors[(teamIndex + 1) % colors.size],
                     onContinue = {
                         game.nextTeam()
@@ -172,7 +173,7 @@ class GameActivity : ComponentActivity() {
                             .align(Alignment.CenterStart)
                             .size(70.dp)
                     ) {
-                        game.nextWord()
+                        game.nextWord(0)
                     }
 
                     Text(
@@ -190,8 +191,7 @@ class GameActivity : ComponentActivity() {
                             .align(Alignment.CenterEnd)
                             .size(70.dp)
                     ) {
-                        game.teams[teamIndex].points += 1
-                        game.nextWord()
+                        game.nextWord(1)
                     }
                 }
 
