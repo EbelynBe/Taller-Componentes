@@ -29,6 +29,7 @@ class GameActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Get category and teams list
         val category = intent.getStringExtra("category") ?: "Animals"
         val teamsList =
             intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
@@ -37,7 +38,7 @@ class GameActivity : ComponentActivity() {
         game = Game(category, teamsList)
 
         setContent {
-            GameScreen(game, onFinish = { result ->
+            GameScreen(game, onFinish = {
                 val intent = Intent(this, ResultsActivity::class.java)
                 intent.putExtra("category", category)
                 intent.putExtra("teamsList", ArrayList(teamsList))
@@ -66,18 +67,18 @@ class GameActivity : ComponentActivity() {
         val word = game.selectedWord
 
         val colors = listOf(
-            Color(0xFFFFCDD2), // Light red
-            Color(0xFFC8E6C9), // Light green
-            Color(0xFFBBDEFB), // Light blue
-            Color(0xFFFFF9C4), // Light yellow
-            Color(0xFFD1C4E9), // Light purple
-            Color(0xFFFFE0B2)  // Light orange
+            Color(0xFFFFCDD2),
+            Color(0xFFC8E6C9),
+            Color(0xFFBBDEFB),
+            Color(0xFFFFF9C4),
+            Color(0xFFD1C4E9),
+            Color(0xFFFFE0B2)
         )
 
         var showNextTeamScreen by remember { mutableStateOf(false) }
         var backgroundColor by remember { mutableStateOf(colors.random()) }
 
-        // Change background color when the word changes
+        // Change background color when word changes
         LaunchedEffect(word) {
             backgroundColor = colors.random()
         }
@@ -87,7 +88,7 @@ class GameActivity : ComponentActivity() {
             game.startTimer { showNextTeamScreen = true }
         }
 
-        // Navigate to results when the game finishes
+        // Go to results if game ends
         if (game.gameFinished.value) {
             LaunchedEffect(Unit) {
                 val result : Int = game.results()
@@ -124,7 +125,7 @@ class GameActivity : ComponentActivity() {
                     .background(backgroundColor)
                     .padding(16.dp)
             ) {
-                // Top-left info (timer, team, points)
+                // Display team info and time
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -155,51 +156,31 @@ class GameActivity : ComponentActivity() {
                     )
                 }
 
-                // Control buttons (pause / restart / continue)
-                Column(
-                    modifier = Modifier.align(Alignment.TopEnd),
-                    horizontalAlignment = Alignment.End
+                // Pause and restart buttons in a row
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 24.dp, end = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    var cont by remember { mutableStateOf(false) }
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
+                    ImagenBoton(
+                        drawableId = R.drawable.pause,
+                        modifier = Modifier.size(50.dp)
                     ) {
-                        Button(
-                            onClick = {
-                                cont = true
-                                game.stopTimer()
-                            }
-                        ) {
-                            Text("Pause")
-                        }
-                        if (cont) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                onClick = {
-                                    game.startTimer { showNextTeamScreen = true }
-                                    cont = false
-                                }
-                            ) {
-                                Text("Continue")
-                            }
-                        }
+                        game.stopTimer()
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            game.resetTimer()
-                            game.startTimer { showNextTeamScreen = true }
-                        }
+
+                    ImagenBoton(
+                        drawableId = R.drawable.restart,
+                        modifier = Modifier.size(50.dp)
                     ) {
-                        Text("Restart")
+                        game.resetTimer()
+                        game.startTimer { showNextTeamScreen = true }
                     }
                 }
 
-
-
-                // Word and correct / wrong buttons
+                // Display word and correct/wrong buttons
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -235,7 +216,7 @@ class GameActivity : ComponentActivity() {
                     }
                 }
 
-                // Return to home button
+                // Home button
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -273,6 +254,7 @@ class GameActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // Display next turn text
                 Text(
                     text = "Next Turn:",
                     fontFamily = wonderian,
@@ -287,8 +269,13 @@ class GameActivity : ComponentActivity() {
                     fontWeight = FontWeight.ExtraBold
                 )
                 Spacer(modifier = Modifier.height(32.dp))
+                // Continue button
                 Button(onClick = onContinue) {
-                    Text("Continue")
+                    Text(
+                        text = "Continue",
+                        fontFamily = wonderian,
+                        fontSize = 25.sp
+                    )
                 }
             }
         }
@@ -300,6 +287,7 @@ class GameActivity : ComponentActivity() {
         modifier: Modifier = Modifier,
         onClick: () -> Unit
     ) {
+        // Button with image
         buttonAnimation(
             drawableId = drawableId,
             onClick = onClick,
