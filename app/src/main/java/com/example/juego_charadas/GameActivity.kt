@@ -90,7 +90,7 @@ class GameActivity : ComponentActivity() {
         // Navigate to results when the game finishes
         if (game.gameFinished.value) {
             LaunchedEffect(Unit) {
-                var result : Int = game.results()
+                val result : Int = game.results()
                 onFinish(result)
             }
         }
@@ -99,7 +99,7 @@ class GameActivity : ComponentActivity() {
             // If all teams have played, go to results
             if (teamIndex + 1 >= game.teams.size) {
                 LaunchedEffect(Unit) {
-                    var result : Int = game.results()
+                    val result : Int = game.results()
                     onFinish(result)
                 }
             } else {
