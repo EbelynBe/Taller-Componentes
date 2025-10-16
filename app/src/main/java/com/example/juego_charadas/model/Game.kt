@@ -16,10 +16,9 @@ import java.io.Serializable
 
 class Game(private val category: String, private val teamsList: MutableList<Team>) : Serializable {
     val teams get() = teamsList
-    private val timeLimit = 5 //
+    private val timeLimit = 60 //
     private var job: Job? = null
 
-    // mejor: _gameFinished privado, gameFinished expuesto como State
     private val _gameFinished = mutableStateOf(false)
     val gameFinished: State<Boolean> get() = _gameFinished
 
@@ -56,7 +55,7 @@ class Game(private val category: String, private val teamsList: MutableList<Team
 
     fun nextWord(num: Int) {
         if(num == 1){
-            currentTeam.points++   // sumas un punto al equipo(lo quite mientras para poner los dos botones )
+            currentTeam.points++
         }
         selectedWord = selectedWordList.random()
 
@@ -69,8 +68,6 @@ class Game(private val category: String, private val teamsList: MutableList<Team
     fun startTimer(onTimeOver: () -> Unit = {}) {
         if (isRunning.value) return
         isRunning.value = true
-        // reiniciamos segundos al comenzar
-        seconds.value = 0
 
         job = CoroutineScope(Dispatchers.Default).launch {
             while (isRunning.value && seconds.value < timeLimit) {
@@ -98,6 +95,7 @@ class Game(private val category: String, private val teamsList: MutableList<Team
         seconds.value = 0
     }
 
+
     fun nextTeam() {
         job?.cancel()
         job = null
@@ -112,5 +110,20 @@ class Game(private val category: String, private val teamsList: MutableList<Team
             seconds.value = 0
             startTimer { nextTeam() }
         }
+    }
+
+    fun results(): Int {
+        var maxPoints = -1
+        var winningTeamIndex = -1
+
+        for ((index, team) in teamsList.withIndex()) {
+            if (team.points > maxPoints) {
+                maxPoints = team.points
+                winningTeamIndex = index
+            }else if (team.points == maxPoints){
+                winningTeamIndex = -1
+            }
+        }
+         return winningTeamIndex + 1
     }
 }

@@ -32,20 +32,33 @@ class GameActivity : ComponentActivity() {
         val category = intent.getStringExtra("category") ?: "Animals"
         val teamsList =
             intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
-
+        // val numTeams = teamsList.size
+        // val totalPlayers = teamsList.sumOf { it.players }
         game = Game(category, teamsList)
 
         setContent {
-            GameScreen(game, onFinish = {
+            GameScreen(game, onFinish = { result ->
                 val intent = Intent(this, ResultsActivity::class.java)
                 intent.putExtra("category", category)
-                startActivity(intent) // Keep activity open
-            })
+                intent.putExtra("teamsList", ArrayList(teamsList))
+                intent.putExtra("result", result)
+                startActivity(intent)
+                finish()
+            },
+                onTeamsActivity = {
+                    val intent = Intent(this, TeamsActivity::class.java)
+                    intent.putExtra("category", category)
+                    //intent.putExtra("totalPlayers", totalPlayers)
+                    //intent.putExtra("teams", numTeams)
+                    intent.putExtra("teamsList", ArrayList(teamsList))
+                    startActivity(intent)
+                    finish()
+                })
         }
     }
 
     @Composable
-    fun GameScreen(game: Game, onFinish: () -> Unit) {
+    fun GameScreen(game: Game, onFinish: (Int) -> Unit, onTeamsActivity: () -> Unit) {
         val wonderian = FontFamily(Font(R.font.wonderian))
 
         val seconds by game.seconds
@@ -77,7 +90,8 @@ class GameActivity : ComponentActivity() {
         // Navigate to results when the game finishes
         if (game.gameFinished.value) {
             LaunchedEffect(Unit) {
-                onFinish()
+                var result : Int = game.results()
+                onFinish(result)
             }
         }
 
@@ -85,7 +99,8 @@ class GameActivity : ComponentActivity() {
             // If all teams have played, go to results
             if (teamIndex + 1 >= game.teams.size) {
                 LaunchedEffect(Unit) {
-                    onFinish()
+                    var result : Int = game.results()
+                    onFinish(result)
                 }
             } else {
                 // Next team screen
@@ -140,22 +155,49 @@ class GameActivity : ComponentActivity() {
                     )
                 }
 
-                // Control buttons (pause / restart)
+                // Control buttons (pause / restart / continue)
                 Column(
                     modifier = Modifier.align(Alignment.TopEnd),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Button(onClick = { game.stopTimer() }) {
-                        Text("Pause")
+                    var cont by remember { mutableStateOf(false) }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            onClick = {
+                                cont = true
+                                game.stopTimer()
+                            }
+                        ) {
+                            Text("Pause")
+                        }
+                        if (cont) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Button(
+                                onClick = {
+                                    game.startTimer { showNextTeamScreen = true }
+                                    cont = false
+                                }
+                            ) {
+                                Text("Continue")
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        game.resetTimer()
-                        game.startTimer { showNextTeamScreen = true }
-                    }) {
+                    Button(
+                        onClick = {
+                            game.resetTimer()
+                            game.startTimer { showNextTeamScreen = true }
+                        }
+                    ) {
                         Text("Restart")
                     }
                 }
+
+
 
                 // Word and correct / wrong buttons
                 Box(
@@ -204,7 +246,8 @@ class GameActivity : ComponentActivity() {
                         drawableId = R.drawable.incio,
                         modifier = Modifier.size(80.dp)
                     ) {
-                        finish()
+                        game.stopTimer()
+                        onTeamsActivity()
                     }
                 }
             }

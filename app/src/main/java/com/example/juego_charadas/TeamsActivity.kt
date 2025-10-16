@@ -35,22 +35,34 @@ class TeamsActivity : ComponentActivity() {
         val totalPlayers = intent.getIntExtra("totalPlayers", 2)
         val category = intent.getStringExtra("category") ?: "No category"
 
-        val playersDistribution = distributePlayersAcrossTeams(totalPlayers, numTeams)
         val customFont = FontFamily(Font(R.font.wonderian))
-        val baseTeams = playersDistribution.map { count -> Team(players = count, points = 0) }
+
+        // Check if a list of teams comes from another activity (such as Results)
+        val receivedTeams = intent.getSerializableExtra("teamsList") as? ArrayList<Team>
+
+        // If teams come, use them. If not, create new ones.
+        val baseTeams = if (!receivedTeams.isNullOrEmpty()) {
+            receivedTeams
+        } else {
+            val playersDistribution = distributePlayersAcrossTeams(totalPlayers, numTeams)
+            ArrayList(playersDistribution.map { count -> Team(players = count, points = 0) })
+        }
 
         setContent {
             TeamsSelector(
                 baseTeams = baseTeams,
                 categoryName = category,
                 customFont = customFont,
-                onBack = { finish() },
+                onBack = {
+                    val intent = Intent(this, MainActivity::class.java)
+                    finish() },
                 onStartGame = {
                     val intent = Intent(this, CountdownActivity::class.java)
                     intent.putExtra("teams", numTeams)
                     intent.putExtra("category", category)
                     intent.putExtra("teamsList", ArrayList(baseTeams))
                     startActivity(intent)
+                    finish()
                 }
             )
         }

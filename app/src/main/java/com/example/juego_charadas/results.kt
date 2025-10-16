@@ -31,7 +31,7 @@ class Results : ComponentActivity() {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Resultadis",
+                text = "Resultados",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black

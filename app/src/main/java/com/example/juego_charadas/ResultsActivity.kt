@@ -27,13 +27,16 @@ class ResultsActivity : AppCompatActivity() {
             val teamsList = intent.getSerializableExtra("teamsList") as? ArrayList<Team> ?: arrayListOf()
             val category = intent.getStringExtra("category") ?: "Animals"
             val numTeams = teamsList.size
-            ResultScreen(
+            val result = intent.getIntExtra("result", 0)
+
+            ResultScreen(result,
                 onTeamsResults = {
                     val intent = Intent(this, TeamsActivity::class.java)
-                    //intent.putExtra("teams", numTeams)
-                    //intent.putExtra("category", category)
-                    //intent.putExtra("teamsList", ArrayList(teamsList))
+                    intent.putExtra("teams", numTeams)
+                    intent.putExtra("category", category)
+                    intent.putExtra("teamsList", ArrayList(teamsList))
                     startActivity(intent)
+                    finish()
                 }
             )
         }
@@ -41,10 +44,10 @@ class ResultsActivity : AppCompatActivity() {
 }
 
 @Composable //teamsList: ArrayList<Team>
-fun ResultScreen(onTeamsResults : () -> Unit) {
+fun ResultScreen(result: Int, onTeamsResults : () -> Unit) {
     val wonderian = FontFamily(Font(R.font.wonderian))
 
-    // 🎨 Degradado con colores de equipos (simulados)
+    // Gradient with team colors (simulated)
     val teamColors = listOf(
         Color(0xFFFF9800), // 🟧 Team 1
         Color(0xFF2196F3), // 🟦 Team 2
@@ -52,15 +55,24 @@ fun ResultScreen(onTeamsResults : () -> Unit) {
         Color(0xFF4CAF50)  // 🟩 Team 4
     )
 
-    // 🏆 Simulación: Team 1 ganó
-    val winnerTeam = 1
+    // Team winner
+    val winnerTeam = result
 
-    val backgroundBrush = Brush.verticalGradient(
-        colors = listOf(
-            teamColors[winnerTeam - 1],
-            Color.Black
+    val backgroundBrush = if (winnerTeam == 0) {
+        Brush.verticalGradient(
+            colors = listOf(
+                Color(0xFF9E9E9E),
+                Color.Black
+            )
         )
-    )
+    } else {
+        Brush.verticalGradient(
+            colors = listOf(
+                teamColors[winnerTeam - 1],
+                Color.Black
+            )
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -73,7 +85,7 @@ fun ResultScreen(onTeamsResults : () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "Results",
+                text = "Results",
                 fontSize = 34.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = wonderian,
@@ -81,26 +93,25 @@ fun ResultScreen(onTeamsResults : () -> Unit) {
             )
             Spacer(modifier = Modifier.height(40.dp))
 
-            Text(
-                text = "🏆 Team $winnerTeam Winner! 🏆",
-                fontSize = 60.sp,
-                fontWeight = FontWeight.ExtraBold,
-                fontFamily = wonderian,
-                color = Color.White
-            )
+            if (winnerTeam == 0) {
+                Text(
+                    text = "🤝It's a tie!🤝",
+                    fontSize = 50.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = wonderian,
+                    color = Color.White
+                )
+            } else {
+                Text(
+                    text = "🏆 Team $winnerTeam Winner! 🏆",
+                    fontSize = 60.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontFamily = wonderian,
+                    color = Color.White
+                )
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
-
-            // Comentarios del código original (no se tocan)
-            //val validTeams = teamsList.filter { it.points >= 0 }
-
-            //if (validTeams.isEmpty()) {
-            //    Text("No hay resultados válidos 😅")
-            //} else {
-            //    validTeams.forEachIndexed { index, team ->
-            //        Text("Team ${index + 1}: ${team.points} puntos")
-            //    }
-            //}
         }
     }
     Box(
