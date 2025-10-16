@@ -16,7 +16,7 @@ import java.io.Serializable
 
 class Game(private val category: String, private val teamsList: MutableList<Team>) : Serializable {
     val teams get() = teamsList
-    private val timeLimit = 5 //mientras
+    private val timeLimit = 5 //
     private var job: Job? = null
 
     // mejor: _gameFinished privado, gameFinished expuesto como State

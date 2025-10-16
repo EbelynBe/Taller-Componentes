@@ -39,7 +39,7 @@ class GameActivity : ComponentActivity() {
             GameScreen(game, onFinish = {
                 val intent = Intent(this, ResultsActivity::class.java)
                 intent.putExtra("category", category)
-                startActivity(intent) // 👈 SIN finish(), para que no se cierre GameActivity
+                startActivity(intent) // Keep activity open
             })
         }
     }
@@ -47,35 +47,34 @@ class GameActivity : ComponentActivity() {
     @Composable
     fun GameScreen(game: Game, onFinish: () -> Unit) {
         val wonderian = FontFamily(Font(R.font.wonderian))
+
         val seconds by game.seconds
         val teamIndex by game.currentTeamIndex
         val word = game.selectedWord
 
         val colors = listOf(
-            Color(0xFFFFCDD2), // Rojo claro
-            Color(0xFFC8E6C9), // Verde claro
-            Color(0xFFBBDEFB), // Azul claro
-            Color(0xFFFFF9C4), // Amarillo claro
-            Color(0xFFD1C4E9), // Violeta claro
-            Color(0xFFFFE0B2)  // Naranja claro
+            Color(0xFFFFCDD2), // Light red
+            Color(0xFFC8E6C9), // Light green
+            Color(0xFFBBDEFB), // Light blue
+            Color(0xFFFFF9C4), // Light yellow
+            Color(0xFFD1C4E9), // Light purple
+            Color(0xFFFFE0B2)  // Light orange
         )
 
         var showNextTeamScreen by remember { mutableStateOf(false) }
         var backgroundColor by remember { mutableStateOf(colors.random()) }
 
-        // Cambia el color al cambiar la palabra
+        // Change background color when the word changes
         LaunchedEffect(word) {
             backgroundColor = colors.random()
         }
 
-        // Inicia el juego
+        // Start game timer
         LaunchedEffect(Unit) {
-            game.startTimer {
-                showNextTeamScreen = true
-            }
+            game.startTimer { showNextTeamScreen = true }
         }
 
-        // Si el juego terminó, pasa a resultados
+        // Navigate to results when the game finishes
         if (game.gameFinished.value) {
             LaunchedEffect(Unit) {
                 onFinish()
@@ -83,13 +82,13 @@ class GameActivity : ComponentActivity() {
         }
 
         if (showNextTeamScreen) {
-            // Si ya fue el último equipo, mostrar resultados
+            // If all teams have played, go to results
             if (teamIndex + 1 >= game.teams.size) {
                 LaunchedEffect(Unit) {
                     onFinish()
                 }
             } else {
-                // Pantalla para el siguiente equipo
+                // Next team screen
                 NextTeamScreen(
                     teamNumber = (teamIndex + 1),
                     teamName = "Team ${(teamIndex + 2)}",
@@ -103,15 +102,14 @@ class GameActivity : ComponentActivity() {
                 )
             }
         } else {
-            // Pantalla principal del juego
+            // Main game screen
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(backgroundColor)
                     .padding(16.dp)
             ) {
-
-                // Información superior
+                // Top-left info (timer, team, points)
                 Column(
                     modifier = Modifier
                         .align(Alignment.TopStart)
@@ -142,7 +140,7 @@ class GameActivity : ComponentActivity() {
                     )
                 }
 
-                // Botones de control
+                // Control buttons (pause / restart)
                 Column(
                     modifier = Modifier.align(Alignment.TopEnd),
                     horizontalAlignment = Alignment.End
@@ -159,7 +157,7 @@ class GameActivity : ComponentActivity() {
                     }
                 }
 
-                // Palabra y botones correct / wrong
+                // Word and correct / wrong buttons
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -195,14 +193,17 @@ class GameActivity : ComponentActivity() {
                     }
                 }
 
-                // Botón de volver al inicio
+                // Return to home button
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(16.dp),
                     contentAlignment = Alignment.BottomEnd
                 ) {
-                    ImagenBoton(R.drawable.incio, Modifier.size(80.dp)) {
+                    ImagenBoton(
+                        drawableId = R.drawable.incio,
+                        modifier = Modifier.size(80.dp)
+                    ) {
                         finish()
                     }
                 }
@@ -218,6 +219,7 @@ class GameActivity : ComponentActivity() {
         onContinue: () -> Unit
     ) {
         val wonderian = FontFamily(Font(R.font.wonderian))
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -250,7 +252,15 @@ class GameActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ImagenBoton(drawableId: Int, modifier: Modifier = Modifier, onClick: () -> Unit) {
-        buttonAnimation(drawableId = drawableId, onClick = onClick, modifier = modifier)
+    fun ImagenBoton(
+        drawableId: Int,
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit
+    ) {
+        buttonAnimation(
+            drawableId = drawableId,
+            onClick = onClick,
+            modifier = modifier
+        )
     }
 }

@@ -5,22 +5,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.graphics.Color
 import com.example.juego_charadas.model.Team
 import com.example.juego_charadas.ui.theme.buttonAnimation
 
@@ -30,12 +33,10 @@ class TeamsActivity : ComponentActivity() {
 
         val numTeams = intent.getIntExtra("teams", 2)
         val totalPlayers = intent.getIntExtra("totalPlayers", 2)
-        val category = intent.getStringExtra("category") ?: "Sin categoría"
+        val category = intent.getStringExtra("category") ?: "No category"
 
         val playersDistribution = distributePlayersAcrossTeams(totalPlayers, numTeams)
-
         val customFont = FontFamily(Font(R.font.wonderian))
-
         val baseTeams = playersDistribution.map { count -> Team(players = count, points = 0) }
 
         setContent {
@@ -55,6 +56,7 @@ class TeamsActivity : ComponentActivity() {
         }
     }
 
+    // Distribute players equally between teams
     private fun distributePlayersAcrossTeams(totalPlayers: Int, numTeams: Int): List<Int> {
         val base = totalPlayers / numTeams
         val remainder = totalPlayers % numTeams
@@ -65,10 +67,17 @@ class TeamsActivity : ComponentActivity() {
 }
 
 @Composable
-fun TeamsSelector(baseTeams: List<Team>, categoryName: String, customFont: FontFamily, onBack: () -> Unit, onStartGame: () -> Unit
+fun TeamsSelector(
+    baseTeams: List<Team>,
+    categoryName: String,
+    customFont: FontFamily,
+    onBack: () -> Unit,
+    onStartGame: () -> Unit
 ) {
     val teamsList = remember { mutableStateListOf<Team>().apply { addAll(baseTeams) } }
+
     Box(modifier = Modifier.fillMaxSize()) {
+        // Background image
         Image(
             painter = painterResource(id = R.drawable.fondo),
             contentDescription = null,
@@ -82,16 +91,34 @@ fun TeamsSelector(baseTeams: List<Team>, categoryName: String, customFont: FontF
                 .padding(top = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Category: $categoryName",
-                fontSize = 32.sp,
-                fontFamily = customFont,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            // Header with back button and category name
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                buttonAnimation(
+                    drawableId = R.drawable.back_arrow,
+                    onClick = onBack,
+                    modifier = Modifier.size(45.dp)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Category: $categoryName",
+                    fontSize = 32.sp,
+                    fontFamily = customFont,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
 
             Spacer(modifier = Modifier.height(30.dp))
 
+            // Grid showing teams info
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
@@ -117,6 +144,7 @@ fun TeamsSelector(baseTeams: List<Team>, categoryName: String, customFont: FontF
                             .height(160.dp),
                         contentAlignment = Alignment.Center
                     ) {
+                        // Team card with animation
                         buttonAnimation(
                             drawableId = drawableId,
                             modifier = Modifier.fillMaxSize(),
@@ -147,34 +175,25 @@ fun TeamsSelector(baseTeams: List<Team>, categoryName: String, customFont: FontF
                     }
                 }
             }
-        }
 
-        // Botón atrás
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            contentAlignment = Alignment.BottomStart
-        ) {
-            buttonAnimation(
-                drawableId = R.drawable.backbutton,
-                onClick = onBack,
-                modifier = Modifier.size(90.dp)
-            )
-        }
+            Spacer(modifier = Modifier.height(20.dp))
 
-        // Botón iniciar
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            buttonAnimation(
-                drawableId = R.drawable.incio,
+            // Blue button to continue
+            Button(
                 onClick = onStartGame,
-                modifier = Modifier.size(90.dp)
-            )
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0)),
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
+                    .width(200.dp)
+                    .height(60.dp)
+            ) {
+                Text(
+                    text = "Continue",
+                    fontSize = 28.sp,
+                    fontFamily = customFont,
+                    color = Color.White
+                )
+            }
         }
     }
 }
